@@ -45,6 +45,12 @@ pub const Lexer = struct {
             '+' => .PLUS,
             '{' => .LBRACE,
             '}' => .RBRACE,
+            '!' => .BANG,
+            '-' => .MINUS,
+            '/' => .SLASH,
+            '*' => .ASTERISK,
+            '<' => .LT,
+            '>' => .GT,
             'a'...'z', 'A'...'Z', '_' => {
                 const text = self.readIdentifier();
                 if (Token.keyword(text)) |token| {

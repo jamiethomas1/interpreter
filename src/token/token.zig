@@ -11,6 +11,12 @@ pub const Token = union(enum) {
     // Operators
     ASSIGN,
     PLUS,
+    BANG,
+    MINUS,
+    SLASH,
+    ASTERISK,
+    LT,
+    GT,
 
     // Delimiters
     COMMA,
