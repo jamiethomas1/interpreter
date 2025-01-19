@@ -25,3 +25,63 @@ test "test next token" {
         try expectEqualDeep(token, tok);
     }
 }
+
+test "full lexer test" {
+    const input =
+        \\let five = 5;
+        \\let ten = 10;
+        \\
+        \\let add = fn(x, y) {
+        \\  x + y;
+        \\};
+        \\
+        \\let result = add(five, ten);
+    ;
+
+    const tokens = [_]Token{
+        .LET,
+        .{ .IDENT = "five" },
+        .ASSIGN,
+        .{ .INT = "5" },
+        .SEMICOLON,
+        .LET,
+        .{ .IDENT = "ten" },
+        .ASSIGN,
+        .{ .INT = "10" },
+        .SEMICOLON,
+        .LET,
+        .{ .IDENT = "add" },
+        .ASSIGN,
+        .FUNCTION,
+        .LPAREN,
+        .{ .IDENT = "x" },
+        .COMMA,
+        .{ .IDENT = "y" },
+        .RPAREN,
+        .LBRACE,
+        .{ .IDENT = "x" },
+        .PLUS,
+        .{ .IDENT = "y" },
+        .SEMICOLON,
+        .RBRACE,
+        .SEMICOLON,
+        .LET,
+        .{ .IDENT = "result" },
+        .ASSIGN,
+        .{ .IDENT = "add" },
+        .LPAREN,
+        .{ .IDENT = "five" },
+        .COMMA,
+        .{ .IDENT = "ten" },
+        .RPAREN,
+        .SEMICOLON,
+        .EOF,
+    };
+
+    var lexer = Lexer.new(input);
+
+    for (tokens) |token| {
+        const tok = lexer.nextToken();
+        try expectEqualDeep(token, tok);
+    }
+}

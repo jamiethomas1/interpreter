@@ -1,4 +1,7 @@
+const std = @import("std");
 const Token = @import("../token/token.zig").Token;
+
+const DEBUG_MODE = false;
 
 pub const Lexer = struct {
     input: []const u8,
@@ -24,11 +27,15 @@ pub const Lexer = struct {
         } else {
             self.ch = self.input[self.readPosition];
         }
+
+        if (DEBUG_MODE) std.debug.print("reading character {c}\n", .{self.ch});
+
         self.position = self.readPosition;
         self.readPosition += 1;
     }
 
     pub fn nextToken(self: *Lexer) Token {
+        self.skipWhitespace();
         const token: Token = switch (self.ch) {
             '=' => .ASSIGN,
             ';' => .SEMICOLON,
@@ -38,10 +45,56 @@ pub const Lexer = struct {
             '+' => .PLUS,
             '{' => .LBRACE,
             '}' => .RBRACE,
-            else => .EOF,
+            'a'...'z', 'A'...'Z', '_' => {
+                const text = self.readIdentifier();
+                if (Token.keyword(text)) |token| {
+                    return token;
+                }
+                return .{ .IDENT = text };
+            },
+            '0'...'9' => {
+                const number = self.readNumber();
+                return .{ .INT = number };
+            },
+            0 => .EOF,
+            else => {
+                if (DEBUG_MODE) {
+                    std.debug.print("failing on character {c}\n", .{self.ch});
+                    std.debug.print("with input {s}\n", .{self.input});
+                }
+                return .ILLEGAL;
+            },
         };
 
         self.readChar();
         return token;
+    }
+
+    fn readIdentifier(self: *Lexer) []const u8 {
+        const position = self.position;
+        while (isLetter(self.ch)) {
+            self.readChar();
+        }
+        return self.input[position..self.position];
+    }
+
+    fn readNumber(self: *Lexer) []const u8 {
+        const position = self.position;
+        while (isDigit(self.ch)) {
+            self.readChar();
+        }
+        return self.input[position..self.position];
+    }
+
+    fn isLetter(ch: u8) bool {
+        return std.ascii.isAlphabetic(ch) or ch == '_';
+    }
+
+    fn isDigit(ch: u8) bool {
+        return std.ascii.isDigit(ch);
+    }
+
+    fn skipWhitespace(self: *Lexer) void {
+        while (std.ascii.isWhitespace(self.ch)) self.readChar();
     }
 };

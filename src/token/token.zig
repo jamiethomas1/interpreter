@@ -1,13 +1,12 @@
-pub const Token = union(enum) {
-    type: []const u8,
-    literal: []const u8,
+const std = @import("std");
 
+pub const Token = union(enum) {
     ILLEGAL,
     EOF,
 
     // Identifiers + literals
-    IDENT,
-    INT,
+    IDENT: []const u8,
+    INT: []const u8,
 
     // Operators
     ASSIGN,
@@ -25,4 +24,12 @@ pub const Token = union(enum) {
     // Keywords
     FUNCTION,
     LET,
+
+    pub fn keyword(ident: []const u8) ?Token {
+        const map = std.StaticStringMap(Token).initComptime(&.{
+            .{ "let", .LET },
+            .{ "fn", .FUNCTION },
+        });
+        return map.get(ident);
+    }
 };
