@@ -30,11 +30,21 @@ pub const Token = union(enum) {
     // Keywords
     FUNCTION,
     LET,
+    TRUE,
+    FALSE,
+    IF,
+    ELSE,
+    RETURN,
 
     pub fn keyword(ident: []const u8) ?Token {
         const map = std.StaticStringMap(Token).initComptime(&.{
             .{ "let", .LET },
             .{ "fn", .FUNCTION },
+            .{ "true", .TRUE },
+            .{ "false", .FALSE },
+            .{ "if", .IF },
+            .{ "else", .ELSE },
+            .{ "return", .RETURN },
         });
         return map.get(ident);
     }

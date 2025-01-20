@@ -38,6 +38,12 @@ test "full lexer test" {
         \\let result = add(five, ten);
         \\!-/*5;
         \\5 < 10 > 5;
+        \\
+        \\if (5 < 10) {
+        \\  return true;
+        \\} else {
+        \\  return false;
+        \\}
     ;
 
     const tokens = [_]Token{
@@ -89,6 +95,23 @@ test "full lexer test" {
         .GT,
         .{ .INT = "5" },
         .SEMICOLON,
+        .IF,
+        .LPAREN,
+        .{ .INT = "5" },
+        .LT,
+        .{ .INT = "10" },
+        .RPAREN,
+        .LBRACE,
+        .RETURN,
+        .TRUE,
+        .SEMICOLON,
+        .RBRACE,
+        .ELSE,
+        .LBRACE,
+        .RETURN,
+        .FALSE,
+        .SEMICOLON,
+        .RBRACE,
         .EOF,
     };
 
