@@ -90,6 +90,10 @@ pub const Lexer = struct {
         return token;
     }
 
+    pub fn hasTokens(self: *Lexer) bool {
+        return self.ch != 0;
+    }
+
     fn readIdentifier(self: *Lexer) []const u8 {
         const position = self.position;
         while (isLetter(self.ch)) {
