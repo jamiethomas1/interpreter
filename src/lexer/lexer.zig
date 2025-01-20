@@ -37,7 +37,6 @@ pub const Lexer = struct {
     pub fn nextToken(self: *Lexer) Token {
         self.skipWhitespace();
         const token: Token = switch (self.ch) {
-            '=' => .ASSIGN,
             ';' => .SEMICOLON,
             '(' => .LPAREN,
             ')' => .RPAREN,
@@ -45,12 +44,27 @@ pub const Lexer = struct {
             '+' => .PLUS,
             '{' => .LBRACE,
             '}' => .RBRACE,
-            '!' => .BANG,
             '-' => .MINUS,
             '/' => .SLASH,
             '*' => .ASTERISK,
             '<' => .LT,
             '>' => .GT,
+            '=' => blk: {
+                if (self.peekChar() == '=') {
+                    self.readChar();
+                    break :blk .EQ;
+                } else {
+                    break :blk .ASSIGN;
+                }
+            },
+            '!' => blk: {
+                if (self.peekChar() == '=') {
+                    self.readChar();
+                    break :blk .NOT_EQ;
+                } else {
+                    break :blk .BANG;
+                }
+            },
             'a'...'z', 'A'...'Z', '_' => {
                 const text = self.readIdentifier();
                 if (Token.keyword(text)) |token| {
@@ -102,5 +116,13 @@ pub const Lexer = struct {
 
     fn skipWhitespace(self: *Lexer) void {
         while (std.ascii.isWhitespace(self.ch)) self.readChar();
+    }
+
+    fn peekChar(self: *Lexer) u8 {
+        if (self.readPosition >= self.input.len) {
+            return 0;
+        } else {
+            return self.input[self.readPosition];
+        }
     }
 };
